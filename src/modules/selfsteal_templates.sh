@@ -2,15 +2,13 @@
 # Module: SelfSteal Templates
 
 show_template_source_options() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[CHOOSE_TEMPLATE_SOURCE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[SIMPLE_WEB_TEMPLATES]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[SNI_TEMPLATES]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}3. ${LANG[NOTHING_TEMPLATES]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[CHOOSE_TEMPLATE_SOURCE]}"
+    menu_item 1 "${LANG[SIMPLE_WEB_TEMPLATES]}"
+    menu_item 2 "${LANG[SNI_TEMPLATES]}"
+    menu_item 3 "${LANG[NOTHING_TEMPLATES]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 randomhtml() {

@@ -2,18 +2,16 @@
 # Module: Manage Panel
 
 show_manage_panel_menu() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[MENU_3]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[START_PANEL_NODE]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[STOP_PANEL_NODE]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}3. ${LANG[UPDATE_PANEL_NODE]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}4. ${LANG[VIEW_LOGS]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}5. ${LANG[REMNAWAVE_CLI]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}6. ${LANG[ACCESS_PANEL]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[MENU_3]}"
+    menu_item 1 "${LANG[START_PANEL_NODE]}"
+    menu_item 2 "${LANG[STOP_PANEL_NODE]}"
+    menu_item 3 "${LANG[UPDATE_PANEL_NODE]}"
+    menu_item 4 "${LANG[VIEW_LOGS]}"
+    menu_item 5 "${LANG[REMNAWAVE_CLI]}"
+    menu_item 6 "${LANG[ACCESS_PANEL]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[MANAGE_PANEL_NODE_PROMPT]}" SUB_OPTION
 
     case $SUB_OPTION in
@@ -207,14 +205,12 @@ view_logs() {
 
 #Manage Panel Access
 show_panel_access() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[MENU_9]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[PORT_8443_OPEN]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[PORT_8443_CLOSE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[MENU_9]}"
+    menu_item 1 "${LANG[PORT_8443_OPEN]}"
+    menu_item 2 "${LANG[PORT_8443_CLOSE]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 manage_panel_access() {

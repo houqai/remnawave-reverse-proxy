@@ -2,14 +2,12 @@
 # Module: IPv6 Management
 
 show_ipv6_menu() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[IPV6_MENU_TITLE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[IPV6_ENABLE]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[IPV6_DISABLE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[IPV6_MENU_TITLE]}"
+    menu_item 1 "${LANG[IPV6_ENABLE]}"
+    menu_item 2 "${LANG[IPV6_DISABLE]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 manage_ipv6() {

@@ -1,207 +1,149 @@
-<p aling="center"><a href="https://github.com/eGamesAPI/remnawave-reverse-proxy">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="./media/logo.png" />
-   <source media="(prefers-color-scheme: light)" srcset="./media/logo-black.png" />
-   <img alt="Remnawave Reverse Proxy" src="https://github.com/eGamesAPI/remnawave-reverse-proxy" />
- </picture>
-</a></p>
+# Remnawave Reverse Proxy
 
-<p align="center">
-  <img src="./media/ru.png" alt="Русский" /> <a href="/README-RU.md">Русский</a> | <img src="./media/us.png" alt="English" /> <strong>English</strong>
-</p>
-
----
+Автоматизация развёртывания обратного прокси на базе **NGINX + XRAY**, а также установки панели управления и ноды **Remnawave**. Xray слушает порт `443` напрямую и передаёт трафик через Unix-сокет в NGINX — это снижает накладные расходы TCP и повышает надёжность соединений.
 
 > [!CAUTION]
-> **THIS REPOSITORY IS AN EDUCATIONAL EXAMPLE FOR LEARNING NGINX, REVERSE PROXY, AND NETWORK SECURITY BASICS. THIS SCRIPT DEMONSTRATES NGINX SETUP AS A REVERSE PROXY. NOT FOR PRODUCTION AND NOT FOR PRODUCTION USE! IF YOU DON'T UNDERSTAND HOW THE CONTROL PANEL WORKS - THAT'S YOUR PROBLEM, NOT THE SCRIPT AUTHOR'S. USE AT YOUR OWN RISK!**
+> Репозиторий — **учебный пример** для изучения NGINX, реверс-прокси и основ сетевой безопасности. **Не для продакшена.** Используйте на свой страх и риск. Применение для обхода блокировок/цензуры в ряде стран незаконно; автор не несёт ответственности за последствия.
 
 ---
 
-## Overview
+## Особенности этого форка
 
-This automation script simplifies the deployment of a reverse proxy server using NGINX and XRAY, as well as the installation of Remnawave control panel and node. The architecture is optimized for performance: Xray runs directly on port 443 and redirects traffic through a Unix socket that NGINX listens to, minimizing TCP overhead and improving connection reliability.
+Это форк [eGamesAPI/remnawave-reverse-proxy](https://github.com/eGamesAPI/remnawave-reverse-proxy) со следующими изменениями:
+
+- **Поддержка Ubuntu 26.04 LTS (Resolute Raccoon).** В оригинале установка падала на 26.04 — добавлено кодовое имя `resolute` в проверку ОС.
+- **Встроенный «Ускоритель ноды» (node-accelerator).** Новый пункт меню: оптимизация ядра/сети (XanMod + BBRv3, sysctl, RPS/RFS, лимиты, swap), фаервол (nftables: анти-скан/флуд + CrowdSec) и диагностика. Локализован (RU/EN), с возможностью отката. Движок — [node-accelerator](https://github.com/jestivald/node-accelerator) (MIT), адаптированный под этот скрипт.
+- **Новый дизайн терминала в стиле Claude.** Тёплая коралловая палитра, шапка в рамке, единообразные меню. Цвета автоматически отключаются при выводе в файл/пайп.
 
 > [!IMPORTANT]
-> Debian and Ubuntu support. The script was tested in a KVM virtualization environment. For proper operation, you will need your own domain. It is recommended to run with root privileges on a freshly installed system.
-
-### Deployment Modes
-
-The script supports flexible deployment configurations:
-
-**1. Single Server Mode**
-- Control panel and XRAY node installed on one machine
-- Suitable for compact installations with moderate traffic
-
-**2. Distributed Mode**
-- **Panel Server**: Management center without XRAY node
-- **Node Server**: Hosts XRAY node with SelfSteal stub for VLESS REALITY
-
-### Domain Requirements
-
-Prepare three domains or subdomains before installation:
-
-1. **Control Panel**: Access to management interface
-2. **Subscription Page**: Client configuration distribution
-3. **SelfSteal Stub**: Camouflage website hosted on node server
+> Поддерживаются Debian (bullseye / bookworm / trixie) и Ubuntu (jammy / noble / resolute). Скрипт тестировался на виртуализации KVM. Нужен собственный домен. Запускать от root на свежей системе.
 
 ---
 
-## Domain Setup
+## Быстрый старт
 
-The script supports two methods for obtaining SSL certificates:
-- **Cloudflare**: Management through Cloudflare API
-- **ACME**: Direct integration with hosting provider
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/houqai/remnawave-reverse-proxy/refs/heads/main/install_remnawave.sh)
+```
 
-### DNS Configuration Examples
-
-#### Single Server Installation (panel + node together)
-
-| Record Type | Name              | Value            | Proxy Status |
-|-------------|-------------------|------------------|--------------|
-| A           | example.com       | your_server_ip   | DNS only     |
-| CNAME       | panel.example.com | example.com      | DNS only     |
-| CNAME       | sub.example.com   | example.com      | DNS only     |
-| CNAME       | node.example.com  | example.com      | DNS only     |
-
-> [!TIP]
-> The `node.example.com` record is optional for SelfSteal functionality. You can use the root domain `example.com` instead.
-
-#### Distributed Installation (panel and node on different servers)
-
-| Record Type | Name              | Value                | Proxy Status |
-|-------------|-------------------|----------------------|--------------|
-| A           | example.com       | panel_server_ip      | DNS only     |
-| CNAME       | panel.example.com | example.com          | DNS only     |
-| CNAME       | sub.example.com   | example.com          | DNS only     |
-| A           | node.example.com  | node_server_ip       | DNS only     |
+После первой установки скрипт доступен командой `remnawave_reverse`.
 
 ---
 
-## Installation Guide
+## Главное меню
 
-### Single Server Deployment
+**Установка и управление**
+1. Установка компонентов Remnawave (панель и/или нода, Nginx или Caddy)
+2. Переустановка панели/ноды
+3. Управление панелью/нодой
 
-1. Run the installation script
-2. Select **"Install Remnawave Components"**
-3. Select **"Install panel and node on one server"**
-4. Wait for completion
-5. The script will automatically restart services and display login credentials
+**Инструменты**
+4. Установка случайного шаблона для selfsteal-ноды
+5. Кастомные расширения от legiz
+6. WARP Native
+7. Бэкап и восстановление
+12. **Ускоритель ноды** (оптимизация / защита / диагностика)
 
-### Distributed Deployment
-
-**Step 1: Panel Server Setup**
-
-1. Run the installation script on the first server
-2. Select **"Install Remnawave Components"**
-3. Select **"Install panel only"**
-4. Save the provided credentials
-
-**Step 2: Certificate Export**
-
-1. Log in to the control panel
-2. Navigate to **Nodes** → **Management**
-3. Select the target node
-4. Find the **"Secret Key (SECRET_KEY)"** field
-5. Copy the certificate using the copy icon
-
-**Step 3: Node Server Setup**
-
-1. Run the installation script on the second server
-2. Select **"Install Remnawave Components"**
-3. Select **"Install node only"**
-4. Paste the certificate when prompted
-5. Confirm the successful node connection message
+**Система**
+8. Управление IPv6
+9. Управление сертификатами домена
+10. Проверка обновлений скрипта
+11. Удаление скрипта
 
 ---
 
-## Security Features
+## Ускоритель ноды (node-accelerator)
 
-### Panel Access Protection
+Пункт **12** главного меню. Подменю:
 
-NGINX configuration implements URL parameter-based authentication to protect against unauthorized discovery:
+- **Оптимизатор** — ядро XanMod (BBRv3), sysctl-тюнинг (буферы под объём RAM, conntrack, anti-spoof, syncookies), RPS/RFS/XPS, лимиты `nofile/nproc`, swap (zram на мелких нодах), THP off, CPU governor, NIC tuning. Идемпотентно.
+- **Защита** — фаервол на nftables (своя таблица `na_filter`, не флашит чужие правила): анти-скан, anti-spoof, защита от SYN/UDP-флуда и ssh-флуда, интеграция с CrowdSec.
+- **Диагностика** — read-only отчёт о состоянии ноды.
+- **Всё сразу** — оптимизация → защита → диагностика.
+- **Откат** — снять оптимизатор и/или фаервол (бэкапы остаются в `/var/backups/node-accelerator/`).
 
-**Access Method**
+После применения на ноде остаётся read-only команда `na-diagnose` (стабильный вывод для мониторинга/панелей).
+
+> [!NOTE]
+> Кастомное ядро XanMod ставится только на x86_64 и не в контейнере (openvz/lxc делят ядро хоста). После установки ядра нужна перезагрузка, чтобы BBRv3 активировался.
+
+---
+
+## Режимы развёртывания
+
+**1. Один сервер** — панель и XRAY-нода на одной машине. Для компактных установок с умеренным трафиком.
+
+**2. Распределённый** — отдельно сервер панели (центр управления) и сервер ноды (XRAY + заглушка SelfSteal для VLESS REALITY).
+
+### Требования к доменам
+
+Подготовьте три домена/поддомена:
+1. **Панель управления** — доступ к интерфейсу
+2. **Страница подписок** — раздача конфигураций клиентам
+3. **Заглушка SelfSteal** — маскировочный сайт на сервере ноды
+
+### Примеры DNS
+
+**Один сервер (панель + нода вместе)**
+
+| Тип   | Имя               | Значение        | Proxy    |
+|-------|-------------------|-----------------|----------|
+| A     | example.com       | your_server_ip  | DNS only |
+| CNAME | panel.example.com | example.com     | DNS only |
+| CNAME | sub.example.com   | example.com     | DNS only |
+| CNAME | node.example.com  | example.com     | DNS only |
+
+> Запись `node.example.com` необязательна — для SelfSteal можно использовать корневой домен.
+
+**Распределённый (панель и нода на разных серверах)**
+
+| Тип   | Имя               | Значение        | Proxy    |
+|-------|-------------------|-----------------|----------|
+| A     | example.com       | panel_server_ip | DNS only |
+| CNAME | panel.example.com | example.com     | DNS only |
+| CNAME | sub.example.com   | example.com     | DNS only |
+| A     | node.example.com  | node_server_ip  | DNS only |
+
+---
+
+## Сертификаты SSL
+
+Два метода получения сертификатов:
+- **Cloudflare** — через API Cloudflare
+- **ACME** — прямая интеграция с провайдером
+
+Автоматическое продление включено.
+
+---
+
+## Защита доступа к панели
+
+NGINX закрывает панель аутентификацией по URL-параметру:
+
 ```
 https://panel.example.com/auth/login?<SECRET_KEY>=<SECRET_KEY>
 ```
 
-**How It Works**
-
-1. URL parameter automatically sets a cookie in the browser
-   - Cookie name: `<SECRET_KEY>`
-   - Cookie value: `<SECRET_KEY>`
-
-2. Access requirements:
-   - Valid cookie must be present
-   - URL must contain correct parameter
-
-3. Failed access behavior:
-   - Missing cookie: Blank page or 404 error
-   - Incorrect parameter: Blank page or 404 error
-
-This protection level prevents:
-- Host scanning discovery
-- Path brute-force attacks
-- Brute-force access attempts
-
-The panel remains invisible without the correct authentication parameter.
+Параметр выставляет cookie (`<SECRET_KEY>` = `<SECRET_KEY>`). Без правильной cookie и параметра панель отдаёт пустую страницу или 404. Это защищает от обнаружения сканированием хоста, перебора путей и брутфорса.
 
 ---
 
-## Features
+## Возможности
 
-### Proxy Server Configuration
-- Automatic configuration updates via subscription
-- JSON subscription support with format conversion for popular clients
-- Compatibility with major proxy clients
-
-### NGINX Integration
-- Optimized reverse proxy setup with XRAY
-- Unix socket communication for reduced overhead
-
-### Security Implementation
-- **Firewall**: UFW configuration for access control
-- **SSL Certificates**: Cloudflare or ACME with automatic renewal
-- **IPv6 Management**: Vulnerability prevention measures
-- **TCP Optimization**: BBR congestion control algorithm
-- **Masking**: Random website template selection
+- Автообновление конфигураций через подписку; JSON-подписка с конвертацией под популярные клиенты
+- Оптимизированный реверс-прокси NGINX ↔ XRAY через Unix-сокет
+- Брандмауэр (UFW), SSL (Cloudflare/ACME с автопродлением), управление IPv6
+- TCP-оптимизация (BBR), маскировка случайным шаблоном сайта
+- Ускоритель ноды (см. выше)
 
 ---
 
-## Quick Start
+## Благодарности
 
-Execute the following command to begin installation:
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/eGamesAPI/remnawave-reverse-proxy/refs/heads/main/install_remnawave.sh)
-```
-
-<p align="center">
-  <img src="./media/remnawave-reverse-proxy_en.png" alt="Installation Interface" />
-</p>
+- [eGamesAPI/remnawave-reverse-proxy](https://github.com/eGamesAPI/remnawave-reverse-proxy) — оригинальный проект
+- [jestivald/node-accelerator](https://github.com/jestivald/node-accelerator) — движок оптимизации/защиты/диагностики (MIT, см. `src/node-accelerator/LICENSE`)
 
 ---
 
 > [!CAUTION]
-> **This repository is intended solely for educational purposes and for studying the principles of reverse proxy servers and network security. The script demonstrates proxy server configuration using NGINX for reverse proxy, traffic management, and attack protection.**
->
-> **We strongly remind you that using this tool to bypass network blocks or censorship is illegal in a number of countries where laws exist regulating the use of technologies to circumvent internet restrictions.**
->
-> **This project is not intended for use in ways that violate information protection laws or interfere with censorship mechanisms. We are not responsible for any legal consequences associated with using this script.**
->
-> **Use this tool/script solely for demonstration purposes, as an example of reverse proxy operation and data protection. We strongly recommend deleting the script after familiarization. Further use is at your own risk.**
->
-> **If you are unsure whether using this tool or its components violates the laws of your country - refrain from any interaction with this tool.**
-
-## Community
-
-Join our Telegram community for support and discussions:
-
-**Telegram chat**: [https://t.me/remnawave_reverse](https://t.me/remnawave_reverse)
-
-## Donations
-
-If you like this project and want to support its further development, please consider making a donation. Your contribution helps fund future updates and improvements!
-
-**Donation Methods:**
-
-- **TON USDT:** `UQAxyZDwKUPQ5Bp09JOFcaDVakjYQT46rf3iP3lnl_qc9xVS`
+> Инструмент предназначен исключительно для образовательных целей и демонстрации работы обратного прокси и сетевой безопасности. Использование для обхода блокировок/цензуры может нарушать законы вашей страны. Авторы не несут ответственности за юридические последствия. Если не уверены в законности — не используйте.

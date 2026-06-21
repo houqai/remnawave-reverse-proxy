@@ -2,17 +2,14 @@
 # Module: WARP Native
 
 manage_warp_native() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[WARP_NATIVE_MENU]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[WARP_INSTALL]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[WARP_UNINSTALL]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}3. ${LANG[WARP_ADD_CONFIG]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}4. ${LANG[WARP_DELETE_WARP_SETTINGS]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[WARP_NATIVE_MENU]}"
+    menu_item 1 "${LANG[WARP_INSTALL]}"
+    menu_item 2 "${LANG[WARP_UNINSTALL]}"
+    menu_item 3 "${LANG[WARP_ADD_CONFIG]}"
+    menu_item 4 "${LANG[WARP_DELETE_WARP_SETTINGS]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[WARP_PROMPT]}" WARP_OPTION
 
     case $WARP_OPTION in
@@ -103,19 +100,17 @@ manage_warp_add_config() {
         return 1
     fi
 
-    echo -e ""
-    echo -e "${COLOR_YELLOW}${LANG[WARP_SELECT_CONFIG]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[WARP_SELECT_CONFIG]}"
     local i=1
     declare -A config_map
     while IFS=' ' read -r name uuid; do
-        echo -e "${COLOR_YELLOW}$i. $name${COLOR_RESET}"
+        menu_item "$i" "$name"
         config_map[$i]="$uuid"
         ((i++))
     done <<< "$configs"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[WARP_PROMPT1]}" CONFIG_OPTION
 
     if [ "$CONFIG_OPTION" == "0" ]; then
@@ -231,19 +226,17 @@ manage_warp_delete_settings() {
         return 1
     fi
 
-    echo -e ""
-    echo -e "${COLOR_YELLOW}${LANG[WARP_SELECT_CONFIG_DELETE]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[WARP_SELECT_CONFIG_DELETE]}"
     local i=1
     declare -A config_map
     while IFS=' ' read -r name uuid; do
-        echo -e "${COLOR_YELLOW}$i. $name${COLOR_RESET}"
+        menu_item "$i" "$name"
         config_map[$i]="$uuid"
         ((i++))
     done <<< "$configs"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[WARP_PROMPT1]}" CONFIG_OPTION
 
     if [ "$CONFIG_OPTION" == "0" ]; then

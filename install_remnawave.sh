@@ -421,14 +421,12 @@ update_remnawave_reverse() {
 }
 
 remove_script() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[MENU_10]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[REMOVE_SCRIPT_ONLY]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[REMOVE_SCRIPT_AND_PANEL]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[MENU_10]}"
+    menu_item 1 "${LANG[REMOVE_SCRIPT_ONLY]}"
+    menu_item 2 "${LANG[REMOVE_SCRIPT_AND_PANEL]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[CERT_PROMPT1]}" SUB_OPTION
 
     case $SUB_OPTION in
@@ -824,15 +822,13 @@ manage_install() {
 
 #Show Reinstall Options
 show_reinstall_options() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[REINSTALL_TYPE_TITLE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[INSTALL_PANEL_NODE]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[INSTALL_PANEL]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}3. ${LANG[INSTALL_NODE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[REINSTALL_TYPE_TITLE]}"
+    menu_item 1 "${LANG[INSTALL_PANEL_NODE]}"
+    menu_item 2 "${LANG[INSTALL_PANEL]}"
+    menu_item 3 "${LANG[INSTALL_NODE]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 choose_reinstall_type() {
@@ -909,14 +905,12 @@ reinstall_remnawave() {
 
 #Extensions by legiz
 show_custom_legiz_menu() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[MENU_5]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[SELECT_SUB_PAGE_CUSTOM1]}${COLOR_RESET}" # Custom sub page
-    echo -e "${COLOR_YELLOW}2. ${LANG[CUSTOM_APP_LIST_MENU]}${COLOR_RESET}" # Edit custom app list and branding
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[MENU_5]}"
+    menu_item 1 "${LANG[SELECT_SUB_PAGE_CUSTOM1]}"   # Custom sub page
+    menu_item 2 "${LANG[CUSTOM_APP_LIST_MENU]}"      # Edit custom app list and branding
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 manage_custom_legiz() {
@@ -981,15 +975,12 @@ manage_custom_legiz() {
 }
 
 show_sub_page_menu() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[SELECT_SUB_PAGE_CUSTOM2]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. Orion web page template (support custom app list)${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}2. ${LANG[RESTORE_SUB_PAGE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[SELECT_SUB_PAGE_CUSTOM2]}"
+    menu_item 1 "Orion web page template (support custom app list)"
+    menu_item 2 "${LANG[RESTORE_SUB_PAGE]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 download_with_fallback() {
@@ -1017,11 +1008,10 @@ branding_add_to_appconfig() {
         return 1
     fi
     
-    echo -e "${COLOR_GREEN}${LANG[BRANDING_SUPPORT_ASK]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[BRANDING_SUPPORT_YES]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[BRANDING_SUPPORT_NO]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[BRANDING_SUPPORT_ASK]}"
+    menu_item 1 "${LANG[BRANDING_SUPPORT_YES]}"
+    menu_item 2 "${LANG[BRANDING_SUPPORT_NO]}"
+    echo
     reading "${LANG[EXTENSIONS_PROMPT]}" BRANDING_OPTION
 
     case $BRANDING_OPTION in
@@ -1130,14 +1120,12 @@ manage_sub_page_upload() {
 }
 
 show_custom_app_menu() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[CUSTOM_APP_LIST_MENU]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[EDIT_BRANDING]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[DELETE_APPS]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[CUSTOM_APP_LIST_MENU]}"
+    menu_item 1 "${LANG[EDIT_BRANDING]}"
+    menu_item 2 "${LANG[DELETE_APPS]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 manage_custom_app_list() {
@@ -1188,15 +1176,13 @@ edit_branding() {
         echo -e "${COLOR_YELLOW}${LANG[BRANDING_SUPPORT_URL]} ${COLOR_WHITE}$support_url${COLOR_RESET}"
     fi
     
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[EDIT_BRANDING]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[EDIT_LOGO]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[EDIT_NAME]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}3. ${LANG[EDIT_SUPPORT_URL]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[EDIT_BRANDING]}"
+    menu_item 1 "${LANG[EDIT_LOGO]}"
+    menu_item 2 "${LANG[EDIT_NAME]}"
+    menu_item 3 "${LANG[EDIT_SUPPORT_URL]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[IPV6_PROMPT]}" BRANDING_OPTION
     
     case $BRANDING_OPTION in
@@ -1268,14 +1254,14 @@ delete_applications() {
     local i=1
     declare -A platform_map
     while IFS= read -r platform; do
-        echo -e "${COLOR_YELLOW}$i. $platform${COLOR_RESET}"
+        menu_item "$i" "$platform"
         platform_map[$i]="$platform"
         ((i++))
     done <<< "$platforms"
-    
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[IPV6_PROMPT]}" PLATFORM_OPTION
     
     if [ "$PLATFORM_OPTION" == "0" ]; then
@@ -1308,14 +1294,14 @@ delete_applications() {
     local j=1
     declare -A app_map
     while IFS= read -r app; do
-        echo -e "${COLOR_YELLOW}$j. $app${COLOR_RESET}"
+        menu_item "$j" "$app"
         app_map[$j]="$app"
         ((j++))
     done <<< "$apps"
-    
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[IPV6_PROMPT]}" APP_DELETE_OPTION
     
     if [ "$APP_DELETE_OPTION" == "0" ]; then
@@ -1396,14 +1382,12 @@ spinner() {
 
 #Extensions by legiz
 show_custom_legiz_menu() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[MENU_5]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[SELECT_SUB_PAGE_CUSTOM1]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[CUSTOM_APP_LIST_MENU]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[MENU_5]}"
+    menu_item 1 "${LANG[SELECT_SUB_PAGE_CUSTOM1]}"
+    menu_item 2 "${LANG[CUSTOM_APP_LIST_MENU]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 install_packages() {
@@ -1799,14 +1783,12 @@ EOL
 
 #Manage Certificates
 show_manage_certificates() {
-    echo -e ""
-    echo -e "${COLOR_GREEN}${LANG[MENU_8]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[CERT_UPDATE]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[CERT_GENERATE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[MENU_8]}"
+    menu_item 1 "${LANG[CERT_UPDATE]}"
+    menu_item 2 "${LANG[CERT_GENERATE]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
 }
 
 manage_certificates() {
@@ -2000,14 +1982,13 @@ EOL
 generate_new_certificates() {
     reading "${LANG[CERT_GENERATE_PROMPT]}" NEW_DOMAIN
 
-    echo -e "${COLOR_YELLOW}${LANG[CERT_METHOD_PROMPT]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}1. ${LANG[CERT_METHOD_CF]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}2. ${LANG[CERT_METHOD_ACME]}${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}3. ${LANG[CERT_METHOD_GCORE]}${COLOR_RESET}"
-    echo -e ""
-    echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-    echo -e ""
+    menu_head "${LANG[CERT_METHOD_PROMPT]}"
+    menu_item 1 "${LANG[CERT_METHOD_CF]}"
+    menu_item 2 "${LANG[CERT_METHOD_ACME]}"
+    menu_item 3 "${LANG[CERT_METHOD_GCORE]}"
+    echo
+    menu_item 0 "${LANG[EXIT]}"
+    echo
     reading "${LANG[CERT_METHOD_CHOOSE]}" CERT_METHOD
 
     if [ "$CERT_METHOD" == "0" ]; then
@@ -2173,15 +2154,13 @@ handle_certificates() {
     done
 
     if [ "$need_certificates" = true ]; then
-        echo -e ""
-        echo -e "${COLOR_YELLOW}${LANG[CERT_METHOD_PROMPT]}${COLOR_RESET}"
-        echo -e ""
-        echo -e "${COLOR_YELLOW}1. ${LANG[CERT_METHOD_CF]}${COLOR_RESET}"
-        echo -e "${COLOR_YELLOW}2. ${LANG[CERT_METHOD_ACME]}${COLOR_RESET}"
-        echo -e "${COLOR_YELLOW}3. ${LANG[CERT_METHOD_GCORE]}${COLOR_RESET}"
-        echo -e ""
-        echo -e "${COLOR_YELLOW}0. ${LANG[EXIT]}${COLOR_RESET}"
-        echo -e ""
+        menu_head "${LANG[CERT_METHOD_PROMPT]}"
+        menu_item 1 "${LANG[CERT_METHOD_CF]}"
+        menu_item 2 "${LANG[CERT_METHOD_ACME]}"
+        menu_item 3 "${LANG[CERT_METHOD_GCORE]}"
+        echo
+        menu_item 0 "${LANG[EXIT]}"
+        echo
         reading "${LANG[CERT_METHOD_CHOOSE]}" cert_method
 
         if [ "$cert_method" == "0" ]; then
