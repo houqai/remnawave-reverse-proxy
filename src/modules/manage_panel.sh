@@ -52,7 +52,7 @@ show_manage_panel_menu() {
             show_manage_panel_menu
             ;;
         0)
-            remnawave_reverse
+            speedwave
             ;;
         *)
             echo -e "${COLOR_YELLOW}${LANG[MANAGE_PANEL_NODE_INVALID_CHOICE]}${COLOR_RESET}"
@@ -227,7 +227,7 @@ manage_panel_access() {
             echo -e "${COLOR_YELLOW}${LANG[EXIT]}${COLOR_RESET}"
             sleep 2
             log_clear
-            remnawave_reverse
+            speedwave
             ;;
         *)
             echo -e "${COLOR_YELLOW}${LANG[IPV6_INVALID_CHOICE]}${COLOR_RESET}"

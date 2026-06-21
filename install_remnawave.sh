@@ -1,12 +1,12 @@
 #!/bin/bash
 
-SCRIPT_VERSION="3.1.1"
+SCRIPT_VERSION="3.2.0"
 UPDATE_AVAILABLE=false
-DIR_REMNAWAVE="/usr/local/remnawave_reverse/"
+DIR_REMNAWAVE="/usr/local/speedwave/"
 LANG_FILE="${DIR_REMNAWAVE}selected_language"
 CACHE_VERSION_FILE="${DIR_REMNAWAVE}.cache_version"
-SCRIPT_URL="https://raw.githubusercontent.com/houqai/remnawave-reverse-proxy/refs/heads/main/install_remnawave.sh"
-LANG_BASE_URL="https://raw.githubusercontent.com/houqai/remnawave-reverse-proxy/refs/heads/main/src/lang"
+SCRIPT_URL="https://raw.githubusercontent.com/houqai/speedwave/refs/heads/main/install_remnawave.sh"
+LANG_BASE_URL="https://raw.githubusercontent.com/houqai/speedwave/refs/heads/main/src/lang"
 
 # ─── Palette (Claude-style coral theme) ──────────────────────────────────────
 # Truecolor ANSI. Auto-disabled on non-tty / NO_COLOR / dumb terminals so piped
@@ -15,7 +15,7 @@ LANG_BASE_URL="https://raw.githubusercontent.com/houqai/remnawave-reverse-proxy/
 # call site repaints to the Claude look without being touched individually.
 #
 # We key on stdin (-t 0), not stdout: log_entry redirects stdout into a `tee` pipe
-# (exec > >(tee ...)), so on re-entry to the menu via the `remnawave_reverse`
+# (exec > >(tee ...)), so on re-entry to the menu via the `speedwave`
 # command stdout is no longer a tty and `-t 1` alone would wrongly drop all colors.
 # stdin stays attached to the terminal in interactive use, so it is the reliable
 # signal. Keep -t 1 too for the rare stdout-tty/stdin-piped case.
@@ -59,8 +59,8 @@ print_header() {
     [[ "${UPDATE_AVAILABLE:-false}" == true ]] && ver="v${SCRIPT_VERSION}   ·   update available"
     echo
     ui_box_top
-    ui_box_line "✻  remnawave reverse-proxy" "$COLOR_CORAL_B"
-    ui_box_line "reverse-proxy & node manager" "$COLOR_GRAY"
+    ui_box_line "✻  SpeedWave" "$COLOR_CORAL_B"
+    ui_box_line "Remnawave reverse-proxy & node manager" "$COLOR_GRAY"
     ui_box_line "$ver" "$COLOR_GRAY"
     ui_box_bot
 }
@@ -74,8 +74,8 @@ download_with_mirrors() {
     # Mirror URLs (GitHub raw content proxies)
     local mirrors=(
         "$file_url"
-        "https://cdn.jsdelivr.net/gh/houqai/remnawave-reverse-proxy@main/${file_url#*main/}"
-        "https://raw.githack.com/houqai/remnawave-reverse-proxy/main/${file_url#*main/}"
+        "https://cdn.jsdelivr.net/gh/houqai/speedwave@main/${file_url#*main/}"
+        "https://raw.githack.com/houqai/speedwave/main/${file_url#*main/}"
         "https://ghproxy.com/${file_url}"
     )
     
@@ -280,14 +280,14 @@ log_clear() {
 
 log_entry() {
   mkdir -p ${DIR_REMNAWAVE}
-  LOGFILE="${DIR_REMNAWAVE}remnawave_reverse.log"
+  LOGFILE="${DIR_REMNAWAVE}speedwave.log"
   exec > >(tee -a "$LOGFILE") 2>&1
 }
 
-update_remnawave_reverse() {
+update_speedwave() {
     local remote_version=$(curl -s "$SCRIPT_URL" | grep -m 1 "SCRIPT_VERSION=" | sed -E 's/.*SCRIPT_VERSION="([^"]+)".*/\1/')
-    local update_script="${DIR_REMNAWAVE}remnawave_reverse"
-    local bin_link="/usr/local/bin/remnawave_reverse"
+    local update_script="${DIR_REMNAWAVE}speedwave"
+    local bin_link="/usr/local/bin/speedwave"
 
     if [ -z "$remote_version" ]; then
         echo -e "${COLOR_YELLOW}${LANG[VERSION_CHECK_FAILED]}${COLOR_RESET}"
@@ -367,7 +367,7 @@ update_remnawave_reverse() {
 
     echo -e ""
 
-    local temp_script="${DIR_REMNAWAVE}remnawave_reverse.tmp"
+    local temp_script="${DIR_REMNAWAVE}speedwave.tmp"
     
     # Use download_with_mirrors for reliable script download
     if download_with_mirrors "$SCRIPT_URL" "$temp_script" "script"; then
@@ -394,7 +394,7 @@ update_remnawave_reverse() {
         printf "${COLOR_GREEN}${LANG[UPDATE_SUCCESS]}${COLOR_RESET}\n" "$remote_version"
         echo -e ""
         echo -e "${COLOR_YELLOW}${LANG[RESTART_REQUIRED]}${COLOR_RESET}"
-        echo -e "${COLOR_YELLOW}${LANG[RELAUNCH_CMD]}${COLOR_GREEN} remnawave_reverse${COLOR_RESET}"
+        echo -e "${COLOR_YELLOW}${LANG[RELAUNCH_CMD]}${COLOR_GREEN} speedwave${COLOR_RESET}"
         exit 0
     else
         # Fallback: try direct download with wget
@@ -422,7 +422,7 @@ update_remnawave_reverse() {
             printf "${COLOR_GREEN}${LANG[UPDATE_SUCCESS]}${COLOR_RESET}\n" "$remote_version"
             echo -e ""
             echo -e "${COLOR_YELLOW}${LANG[RESTART_REQUIRED]}${COLOR_RESET}"
-            echo -e "${COLOR_YELLOW}${LANG[RELAUNCH_CMD]}${COLOR_GREEN} remnawave_reverse${COLOR_RESET}"
+            echo -e "${COLOR_YELLOW}${LANG[RELAUNCH_CMD]}${COLOR_GREEN} speedwave${COLOR_RESET}"
             exit 0
         fi
         
@@ -450,8 +450,8 @@ remove_script() {
                 return 0
             fi
 
-            rm -rf /usr/local/remnawave_reverse 2>/dev/null
-            rm -f /usr/local/bin/remnawave_reverse 2>/dev/null
+            rm -rf /usr/local/speedwave 2>/dev/null
+            rm -f /usr/local/bin/speedwave 2>/dev/null
             
             echo -e "${COLOR_GREEN}${LANG[SCRIPT_REMOVED]}${COLOR_RESET}"
             exit 0
@@ -478,8 +478,8 @@ remove_script() {
             fi
             docker system prune -a --volumes -f > /dev/null 2>&1 &
             spinner $! "${LANG[WAITING]}"
-            rm -rf /usr/local/remnawave_reverse 2>/dev/null
-            rm -f /usr/local/bin/remnawave_reverse 2>/dev/null
+            rm -rf /usr/local/speedwave 2>/dev/null
+            rm -f /usr/local/bin/speedwave 2>/dev/null
 
             echo -e "${COLOR_GREEN}${LANG[ALL_REMOVED]}${COLOR_RESET}"
             exit 0
@@ -497,23 +497,23 @@ remove_script() {
 }
 
 install_script_if_missing() {
-    if [ ! -f "${DIR_REMNAWAVE}remnawave_reverse" ] || [ ! -f "/usr/local/bin/remnawave_reverse" ]; then
+    if [ ! -f "${DIR_REMNAWAVE}speedwave" ] || [ ! -f "/usr/local/bin/speedwave" ]; then
         mkdir -p "${DIR_REMNAWAVE}"
         
         # Use download_with_mirrors for reliable download
-        if ! download_with_mirrors "$SCRIPT_URL" "${DIR_REMNAWAVE}remnawave_reverse" "script"; then
+        if ! download_with_mirrors "$SCRIPT_URL" "${DIR_REMNAWAVE}speedwave" "script"; then
             # Fallback: try direct download
-            if ! wget -q -O "${DIR_REMNAWAVE}remnawave_reverse" "$SCRIPT_URL" 2>/dev/null; then
+            if ! wget -q -O "${DIR_REMNAWAVE}speedwave" "$SCRIPT_URL" 2>/dev/null; then
                 exit 1
             fi
         fi
         
-        chmod +x "${DIR_REMNAWAVE}remnawave_reverse"
-        ln -sf "${DIR_REMNAWAVE}remnawave_reverse" /usr/local/bin/remnawave_reverse
+        chmod +x "${DIR_REMNAWAVE}speedwave"
+        ln -sf "${DIR_REMNAWAVE}speedwave" /usr/local/bin/speedwave
     fi
 
     local bashrc_file="/etc/bash.bashrc"
-    local alias_line="alias rr='remnawave_reverse'"
+    local alias_line="alias sw='speedwave'"
 
     if [ ! -f "$bashrc_file" ]; then
         touch "$bashrc_file"
@@ -524,7 +524,7 @@ install_script_if_missing() {
         echo >> "$bashrc_file"
     fi
 
-    if ! grep -E "^[[:space:]]*alias rr='remnawave_reverse'[[:space:]]*$" "$bashrc_file" > /dev/null; then
+    if ! grep -E "^[[:space:]]*alias sw='speedwave'[[:space:]]*$" "$bashrc_file" > /dev/null; then
         echo "$alias_line" >> "$bashrc_file"
         printf "${COLOR_GREEN}${LANG[ALIAS_ADDED]}${COLOR_RESET}\n" "$bashrc_file"
         printf "${COLOR_YELLOW}${LANG[ALIAS_ACTIVATE_GLOBAL]}${COLOR_RESET}\n" "$bashrc_file"
@@ -636,8 +636,8 @@ show_menu() {
     echo
     menu_item 0 "${LANG[EXIT]}"
     echo
-    printf "  %b%s%b\n" "$COLOR_DIM" "Wiki: https://wiki.egam.es/" "$COLOR_RESET"
-    printf "  %b%s%b\n" "$COLOR_DIM" "${LANG[FAST_START]//remnawave_reverse/remnawave_reverse}" "$COLOR_RESET"
+    printf "  %b%s%b\n" "$COLOR_DIM" "SpeedWave: https://github.com/houqai/speedwave" "$COLOR_RESET"
+    printf "  %b%s%b\n" "$COLOR_DIM" "${LANG[FAST_START]}" "$COLOR_RESET"
     echo
 }
 
@@ -743,7 +743,7 @@ manage_install() {
                 0)
                     echo -e "${COLOR_YELLOW}${LANG[EXIT]}${COLOR_RESET}"
                     log_clear
-                    remnawave_reverse
+                    speedwave
                     return
                     ;;
                 *)
@@ -760,7 +760,7 @@ manage_install() {
         0)
             echo -e "${COLOR_YELLOW}${LANG[EXIT]}${COLOR_RESET}"
             log_clear
-            remnawave_reverse
+            speedwave
             ;;
         *)
             echo -e "${COLOR_YELLOW}${LANG[INSTALL_INVALID_CHOICE]}${COLOR_RESET}"
@@ -808,7 +808,7 @@ choose_reinstall_type() {
                 ;;
             0)
                 echo -e "${COLOR_YELLOW}${LANG[EXIT]}${COLOR_RESET}"
-                remnawave_reverse
+                speedwave
                 ;;
             *)
                 echo -e "${COLOR_YELLOW}${LANG[INVALID_REINSTALL_CHOICE]}${COLOR_RESET}"
@@ -1765,7 +1765,7 @@ manage_certificates() {
             ;;
         0)
             echo -e "${COLOR_YELLOW}${LANG[EXIT]}${COLOR_RESET}"
-            remnawave_reverse
+            speedwave
             ;;
         *)
             echo -e "${COLOR_YELLOW}${LANG[CERT_INVALID_CHOICE]}${COLOR_RESET}"
@@ -1922,7 +1922,7 @@ EOL
 
     sleep 2
     log_clear
-    remnawave_reverse
+    speedwave
 }
 
 generate_new_certificates() {
@@ -1968,7 +1968,7 @@ generate_new_certificates() {
 
     sleep 2
     log_clear
-    remnawave_reverse
+    speedwave
 }
 
 check_cert_expiry() {
@@ -2233,7 +2233,7 @@ load_module() {
     local module_name="$1"
     local module_type="${2:-modules}"
     local module_file="${DIR_REMNAWAVE}${module_type}/${module_name}.sh"
-    local module_url="https://raw.githubusercontent.com/houqai/remnawave-reverse-proxy/refs/heads/main/src/${module_type}/${module_name}.sh"
+    local module_url="https://raw.githubusercontent.com/houqai/speedwave/refs/heads/main/src/${module_type}/${module_name}.sh"
     local force_update="${3:-false}"
 
     if [ "$force_update" = "true" ] || [ ! -f "$module_file" ]; then
@@ -2340,7 +2340,7 @@ case $OPTION in
             install_blocked_template
             sleep 2
             log_clear
-            remnawave_reverse
+            speedwave
         fi
         ;;
     5)
@@ -2348,7 +2348,7 @@ case $OPTION in
         manage_warp_native
         sleep 2
         log_clear
-        remnawave_reverse
+        speedwave
         ;;
     6)
         if [ -f ~/backup-restore.sh ]; then
@@ -2358,26 +2358,26 @@ case $OPTION in
         fi
         sleep 2
         log_clear
-        remnawave_reverse
+        speedwave
         ;;
     9)
         load_ipv6_module
         manage_ipv6
         sleep 2
         log_clear
-        remnawave_reverse
+        speedwave
         ;;
     10)
         manage_certificates
         sleep 2
         log_clear
-        remnawave_reverse
+        speedwave
         ;;
     11)
-        update_remnawave_reverse
+        update_speedwave
         sleep 2
         log_clear
-        remnawave_reverse
+        speedwave
         ;;
     12)
         remove_script
@@ -2387,14 +2387,14 @@ case $OPTION in
         manage_node_accelerator
         sleep 2
         log_clear
-        remnawave_reverse
+        speedwave
         ;;
     8)
         load_rw_core_module
         manage_rw_core
         sleep 2
         log_clear
-        remnawave_reverse
+        speedwave
         ;;
     0)
         echo -e "${COLOR_YELLOW}${LANG[EXIT]}${COLOR_RESET}"

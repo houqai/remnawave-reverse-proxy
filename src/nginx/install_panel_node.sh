@@ -603,7 +603,7 @@ EOL
     echo -e "${COLOR_YELLOW}${LANG[PASSWORD]} ${COLOR_WHITE}$SUPERADMIN_PASSWORD${COLOR_RESET}"
     echo -e "${COLOR_YELLOW}-------------------------------------------------${COLOR_RESET}"
     echo -e "${COLOR_YELLOW}${LANG[RELAUNCH_CMD]}${COLOR_RESET}"
-    echo -e "${COLOR_GREEN}remnawave_reverse${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}speedwave${COLOR_RESET}"
     echo -e "${COLOR_YELLOW}=================================================${COLOR_RESET}"
 
     install_blocked_template

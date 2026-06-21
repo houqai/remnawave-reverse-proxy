@@ -4,8 +4,8 @@
 declare -gA LANG
 
 #Alias
-LANG[ALIAS_ADDED]="Alias 'rr' for 'remnawave_reverse' added to %s"
-LANG[ALIAS_ACTIVATE_GLOBAL]="Alias 'rr' is now available for all users. Run 'source %s' or open a new terminal to apply."
+LANG[ALIAS_ADDED]="Alias 'sw' for 'speedwave' added to %s"
+LANG[ALIAS_ACTIVATE_GLOBAL]="Alias 'sw' is now available for all users. Run 'source %s' or open a new terminal to apply."
 #Lang
 LANG[CHOOSE_LANG]="Select language:"
 LANG[LANG_EN]="English"
@@ -43,7 +43,7 @@ LANG[LANG_FILE_UPDATED]="✓ %s updated"
 LANG[LANG_FILE_UPDATE_FAILED]="✗ Failed to update %s"
 LANG[UPDATING_MODULES]="Updating modules..."
 #Menu
-LANG[MENU_TITLE]="REMNAWAVE REVERSE-PROXY by eGames"
+LANG[MENU_TITLE]="SPEEDWAVE"
 LANG[AVAILABLE_UPDATE]="script update available"
 LANG[VERSION_LABEL]="Version: %s"
 LANG[EXIT]="Exit"
@@ -85,7 +85,7 @@ LANG[NA_PROMPT]="Select option:"
 LANG[NA_INVALID]="Invalid choice."
 LANG[NA_CONTINUE]="Press Enter to return to the menu"
 LANG[NA_FETCH_FAIL]="Failed to download node-accelerator modules."
-LANG[NA_CREDIT]="Engine: node-accelerator (MIT) · adapted for remnawave-reverse-proxy"
+LANG[NA_CREDIT]="Engine: node-accelerator (MIT) · adapted for speedwave"
 LANG[NA_GROUP_NODE]="Node (remnanode)"
 LANG[NA_RW_CORE]="Update node core (rw-core / Xray) from source"
 
@@ -481,7 +481,7 @@ LANG[ERROR_SETTING_YQ_PERMISSIONS]="Error setting yq permissions!"
 LANG[YQ_SUCCESSFULLY_INSTALLED]="yq successfully installed!"
 LANG[YQ_DOESNT_WORK_AFTER_INSTALLATION]="Error: yq doesn't work after installation!"
 LANG[ERROR_DOWNLOADING_YQ]="Error downloading yq!"
-LANG[FAST_START]="Quick start: remnawave_reverse"
+LANG[FAST_START]="Quick start: speedwave"
 LANG[CREATING_API_TOKEN]="Creating API token for Subscription Page..."
 LANG[API_TOKEN_ADDED]="API token Subscription Page successfully added to docker-compose.yml"
 LANG[ERROR_CREATE_API_TOKEN]="Error creating API token"

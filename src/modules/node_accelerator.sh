@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# node_accelerator.sh — remnawave-reverse-proxy module.
+# node_accelerator.sh — speedwave module.
 #
 # Native, localized (RU/EN), Claude-styled front-end for the node-accelerator
 # toolkit (⚡ kernel/network optimizer · 🛡 nftables+CrowdSec firewall · 🩺
 # diagnostics). The heavy operational logic lives unchanged in
 # src/node-accelerator/ (vendored, MIT — © jestivald/node-accelerator); this
 # module only provides the integrated menu, download and orchestration so the
-# feature looks and behaves like a first-class part of remnawave-reverse-proxy.
+# feature looks and behaves like a first-class part of speedwave.
 #
 # Sourced into install_remnawave.sh, so it reuses the shared UI helpers
 # (print_header, menu_item, menu_head, msg_*, reading), palette (COLOR_*),
@@ -46,7 +46,7 @@ na_persist() {
     install -m 0755 "$NA_DIR/diagnose.sh"   "$NA_LIB_DIR/diagnose.sh"   2>/dev/null || true
     cat > /usr/local/sbin/na-diagnose <<EOF
 #!/usr/bin/env bash
-# node-accelerator CLI (created by remnawave-reverse-proxy). Removed on rollback.
+# node-accelerator CLI (created by speedwave). Removed on rollback.
 exec bash "$NA_LIB_DIR/diagnose.sh" "\$@"
 EOF
     chmod +x /usr/local/sbin/na-diagnose 2>/dev/null || true
@@ -109,7 +109,7 @@ show_node_accelerator_menu() {
     echo
     menu_item 0 "${LANG[NA_BACK]:-Back}"
     echo
-    printf "  %b%s%b\n" "$COLOR_DIM" "${LANG[NA_CREDIT]:-Engine: node-accelerator (MIT) · adapted for remnawave-reverse-proxy}" "$COLOR_RESET"
+    printf "  %b%s%b\n" "$COLOR_DIM" "${LANG[NA_CREDIT]:-Engine: node-accelerator (MIT) · adapted for speedwave}" "$COLOR_RESET"
     echo
 }
 

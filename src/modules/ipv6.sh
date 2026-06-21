@@ -29,7 +29,7 @@ manage_ipv6() {
         0)
             echo -e "${COLOR_YELLOW}${LANG[EXIT]}${COLOR_RESET}"
             log_clear
-            remnawave_reverse
+            speedwave
             ;;
         *)
             echo -e "${COLOR_YELLOW}${LANG[IPV6_INVALID_CHOICE]}${COLOR_RESET}"

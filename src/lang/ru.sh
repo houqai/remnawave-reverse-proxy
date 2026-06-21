@@ -4,12 +4,12 @@
 declare -gA LANG
 
 #Alias
-LANG[ALIAS_ADDED]="Алиас 'rr' для 'remnawave_reverse' добавлен в %s"
-LANG[ALIAS_ACTIVATE_GLOBAL]="Алиас 'rr' теперь доступен для всех пользователей. Выполните 'source %s' или перезапустите терминал, чтобы применить алиас."
+LANG[ALIAS_ADDED]="Алиас 'sw' для 'speedwave' добавлен в %s"
+LANG[ALIAS_ACTIVATE_GLOBAL]="Алиас 'sw' теперь доступен для всех пользователей. Выполните 'source %s' или перезапустите терминал, чтобы применить алиас."
 #Check
 LANG[ERROR_ROOT]="Скрипт нужно запускать с правами root"
 LANG[ERROR_OS]="Поддержка только Debian 11/12 и Ubuntu 22.04/24.04"
-LANG[MENU_TITLE]="REMNAWAVE REVERSE-PROXY by eGames"
+LANG[MENU_TITLE]="SPEEDWAVE"
 LANG[AVAILABLE_UPDATE]="доступно обновление скрипта"
 LANG[VERSION_LABEL]="Версия: %s"
 #Install Packages
@@ -81,7 +81,7 @@ LANG[NA_PROMPT]="Выберите пункт:"
 LANG[NA_INVALID]="Неверный выбор."
 LANG[NA_CONTINUE]="Нажмите Enter, чтобы вернуться в меню"
 LANG[NA_FETCH_FAIL]="Не удалось скачать модули node-accelerator."
-LANG[NA_CREDIT]="Движок: node-accelerator (MIT) · адаптировано для remnawave-reverse-proxy"
+LANG[NA_CREDIT]="Движок: node-accelerator (MIT) · адаптировано для speedwave"
 LANG[NA_GROUP_NODE]="Нода (remnanode)"
 LANG[NA_RW_CORE]="Обновить ядро ноды (rw-core / Xray) из исходников"
 
@@ -476,7 +476,7 @@ LANG[ERROR_SETTING_YQ_PERMISSIONS]="Ошибка установки прав yq!
 LANG[YQ_SUCCESSFULLY_INSTALLED]="yq успешно установлен!"
 LANG[YQ_DOESNT_WORK_AFTER_INSTALLATION]="Ошибка: yq не работает после установки!"
 LANG[ERROR_DOWNLOADING_YQ]="Ошибка загрузки yq!"
-LANG[FAST_START]="Быстрый запуск: remnawave_reverse"
+LANG[FAST_START]="Быстрый запуск: speedwave"
 LANG[CREATING_API_TOKEN]="Создание API токена для Subscription Page..."
 LANG[API_TOKEN_ADDED]="API токен Subscription Page успешно добавлен в docker-compose.yml"
 LANG[ERROR_CREATE_API_TOKEN]="Ошибка создания API токена"

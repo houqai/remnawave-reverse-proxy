@@ -4,7 +4,7 @@
 # с другими тулкитами и с CrowdSec/Docker.
 
 # shellcheck disable=SC2034
-# Palette adapted to remnawave-reverse-proxy's Claude-style coral theme. Variable
+# Palette adapted to speedwave's Claude-style coral theme. Variable
 # and function names are kept identical to upstream so the optimize/protect/diagnose
 # modules repaint without any other change. Auto-disabled on non-tty / NO_COLOR.
 if { [ -t 0 ] || [ -t 1 ]; } && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-}" != "dumb" ]; then

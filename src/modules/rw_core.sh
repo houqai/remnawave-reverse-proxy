@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# rw_core.sh — remnawave-reverse-proxy module: build & update the remnanode Xray
+# rw_core.sh — speedwave module: build & update the remnanode Xray
 # core ("rw-core") from source.
 #
 # Inside the remnawave/node image the proxy engine is XTLS/Xray-core, installed at
@@ -133,7 +133,7 @@ rw_install_into_node() {
     # Bind-mount our binary over the image's /usr/local/bin/xray (rw-core -> xray).
     # An override file keeps the user's main docker-compose.yml untouched.
     cat > "$dir/docker-compose.override.yml" <<EOF
-# Managed by remnawave-reverse-proxy (rw-core updater). Mounts a locally built
+# Managed by speedwave (rw-core updater). Mounts a locally built
 # Xray-core over the image core. Remove this file to revert to the bundled core.
 services:
   remnanode:

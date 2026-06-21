@@ -1,4 +1,4 @@
-# Remnawave Reverse Proxy
+# SpeedWave
 
 Автоматизация развёртывания обратного прокси на базе **NGINX + XRAY**, а также установки панели управления и ноды **Remnawave**. Xray слушает порт `443` напрямую и передаёт трафик через Unix-сокет в NGINX — это снижает накладные расходы TCP и повышает надёжность соединений.
 
@@ -7,9 +7,9 @@
 
 ---
 
-## Особенности этого форка
+## Особенности
 
-Это форк [eGamesAPI/remnawave-reverse-proxy](https://github.com/eGamesAPI/remnawave-reverse-proxy) со следующими изменениями:
+**SpeedWave** — установщик панели и ноды **Remnawave** с обратным прокси NGINX + XRAY. Ключевые особенности:
 
 - **Поддержка Ubuntu 26.04 LTS (Resolute Raccoon).** В оригинале установка падала на 26.04 — добавлено кодовое имя `resolute` в проверку ОС.
 - **Встроенный «Ускоритель ноды» (node-accelerator).** Новый пункт меню: оптимизация ядра/сети (XanMod + BBRv3, sysctl, RPS/RFS, лимиты, swap), фаервол (nftables: анти-скан/флуд + CrowdSec) и диагностика. Локализован (RU/EN), с возможностью отката. Движок — [node-accelerator](https://github.com/jestivald/node-accelerator) (MIT), адаптированный под этот скрипт.
@@ -27,10 +27,10 @@
 ## Быстрый старт
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/houqai/remnawave-reverse-proxy/refs/heads/main/install_remnawave.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/houqai/speedwave/refs/heads/main/install_remnawave.sh)
 ```
 
-После первой установки скрипт доступен командой `remnawave_reverse`.
+После первой установки скрипт доступен командой `speedwave` (или коротким алиасом `sw`).
 
 ---
 
@@ -163,7 +163,7 @@ https://panel.example.com/auth/login?<SECRET_KEY>=<SECRET_KEY>
 
 ## Благодарности
 
-- [eGamesAPI/remnawave-reverse-proxy](https://github.com/eGamesAPI/remnawave-reverse-proxy) — оригинальный проект
+- [eGamesAPI/remnawave-reverse-proxy](https://github.com/eGamesAPI/remnawave-reverse-proxy) — проект, на основе которого создан SpeedWave
 - [jestivald/node-accelerator](https://github.com/jestivald/node-accelerator) — движок оптимизации/защиты/диагностики (MIT, см. `src/node-accelerator/LICENSE`)
 - [XTLS/Xray-core](https://github.com/XTLS/Xray-core) — ядро Xray, собираемое из исходников модулем rw-core (MPL-2.0)
 
