@@ -2262,6 +2262,7 @@ load_warp_module() { load_module "warp" "modules" "${1:-false}"; }
 load_ipv6_module() { load_module "ipv6" "modules" "${1:-false}"; }
 load_selfsteal_templates_module() { load_module "selfsteal_templates" "modules" "${1:-false}"; }
 load_node_accelerator_module() { load_module "node_accelerator" "modules" "${1:-false}"; }
+load_rw_core_module() { load_module "rw_core" "modules" "${1:-false}"; }
 
 log_entry
 

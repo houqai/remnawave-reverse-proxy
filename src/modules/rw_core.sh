@@ -1,0 +1,216 @@
+#!/bin/bash
+#
+# rw_core.sh — remnawave-reverse-proxy module: build & update the remnanode Xray
+# core ("rw-core") from source.
+#
+# Inside the remnawave/node image the proxy engine is XTLS/Xray-core, installed at
+# /usr/local/bin/xray with a symlink rw-core -> xray, launched by supervisord as
+# `/usr/local/bin/rw-core`. This module builds the LATEST Xray-core release from
+# source (Go) and bind-mounts the resulting binary over /usr/local/bin/xray via a
+# docker-compose.override.yml, then recreates the node. It tracks the built version
+# and can rebuild only when upstream has a newer release. All build artifacts (Go
+# toolchain, sources, caches) are removed afterwards so nothing lingers on the SSD.
+#
+# Sourced into install_remnawave.sh: reuses COLOR_*, msg_*, menu_*, reading,
+# question, spinner, print_header.
+
+RW_REPO="https://github.com/XTLS/Xray-core"
+RW_API_LATEST="https://api.github.com/repos/XTLS/Xray-core/releases/latest"
+
+# Locate the directory whose docker-compose runs the remnanode container.
+rw_node_dir() {
+    local d
+    for d in /opt/remnanode /opt/remnawave; do
+        if [ -f "$d/docker-compose.yml" ] && grep -q "remnanode" "$d/docker-compose.yml" 2>/dev/null; then
+            echo "$d"; return 0
+        fi
+    done
+    return 1
+}
+
+rw_latest_tag() {
+    local t
+    t="$(curl -fsSL "$RW_API_LATEST" 2>/dev/null | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
+    if [ -z "$t" ]; then
+        # Fallback: newest semver tag via git (no API rate limit)
+        t="$(git ls-remote --tags --refs "$RW_REPO" 2>/dev/null | sed -E 's#.*refs/tags/##' | grep -E '^v[0-9]' | sort -V | tail -1)"
+    fi
+    echo "$t"
+}
+
+rw_installed_ver() {
+    local dir="$1"
+    [ -f "$dir/.rw-core-version" ] && cat "$dir/.rw-core-version" || echo ""
+}
+
+rw_arch() {
+    case "$(uname -m)" in
+        x86_64|amd64) echo "amd64" ;;
+        aarch64|arm64) echo "arm64" ;;
+        *) echo "" ;;
+    esac
+}
+
+# Download the Go toolchain version required by Xray into $1; echoes nothing, sets
+# global RW_GO_BIN. Caller removes the temp dir afterwards.
+rw_fetch_go() {
+    local tmp="$1" arch="$2"
+    local gv
+    gv="$(curl -fsSL 'https://go.dev/VERSION?m=text' 2>/dev/null | head -1)"   # e.g. go1.26.4
+    [ -z "$gv" ] && { msg_err "${LANG[RW_GO_FAIL]:-Could not determine latest Go version}"; return 1; }
+    local url="https://go.dev/dl/${gv}.linux-${arch}.tar.gz"
+    msg_info "$(printf "${LANG[RW_GO_DL]:-Downloading Go toolchain (%s)...}" "$gv")"
+    curl -fsSL "$url" -o "$tmp/go.tgz" || { msg_err "${LANG[RW_GO_FAIL]:-Go download failed}"; return 1; }
+    tar -C "$tmp" -xzf "$tmp/go.tgz" || { msg_err "${LANG[RW_GO_FAIL]:-Go unpack failed}"; return 1; }
+    rm -f "$tmp/go.tgz"
+    RW_GO_BIN="$tmp/go/bin/go"
+    [ -x "$RW_GO_BIN" ]
+}
+
+# Build Xray-core $tag into $tmp/xray. Everything (sources, caches, toolchain)
+# lives under $tmp so a single rm -rf cleans the disk.
+rw_build() {
+    local tmp="$1" tag="$2" arch="$3"
+    local log="$tmp/build.log"
+
+    rw_fetch_go "$tmp" "$arch" || return 1
+
+    msg_info "$(printf "${LANG[RW_CLONING]:-Cloning Xray-core %s...}" "$tag")"
+    git clone --depth 1 --branch "$tag" "$RW_REPO" "$tmp/src" >"$log" 2>&1 || {
+        msg_err "${LANG[RW_CLONE_FAIL]:-git clone failed}"; tail -n 5 "$log"; return 1; }
+
+    export GOROOT="$tmp/go" GOPATH="$tmp/gopath" GOCACHE="$tmp/gocache" GOMODCACHE="$tmp/gomod"
+    export PATH="$tmp/go/bin:$PATH" CGO_ENABLED=0
+
+    msg_info "${LANG[RW_BUILDING]:-Building (this can take a few minutes)...}"
+    ( cd "$tmp/src" && "$RW_GO_BIN" build -o "$tmp/xray" -trimpath -buildvcs=false \
+        -ldflags="-s -w -buildid=" ./main ) >>"$log" 2>&1 &
+    local pid=$!
+    spinner "$pid" "${LANG[RW_BUILDING]:-Building...}"
+    wait "$pid" || { msg_err "${LANG[RW_BUILD_FAIL]:-Build failed}"; tail -n 8 "$log"; return 1; }
+
+    [ -x "$tmp/xray" ] || { msg_err "${LANG[RW_BUILD_FAIL]:-Build produced no binary}"; return 1; }
+    # Sanity-check the binary runs
+    "$tmp/xray" version >/dev/null 2>&1 || { msg_err "${LANG[RW_BUILD_FAIL]:-Built binary does not run}"; return 1; }
+    return 0
+}
+
+# Wire the built core into the node and recreate it.
+rw_install_into_node() {
+    local dir="$1" tmp="$2" tag="$3"
+    install -m 0755 "$tmp/xray" "$dir/rw-core" || { msg_err "${LANG[RW_BUILD_FAIL]:-install failed}"; return 1; }
+
+    # Bind-mount our binary over the image's /usr/local/bin/xray (rw-core -> xray).
+    # An override file keeps the user's main docker-compose.yml untouched.
+    cat > "$dir/docker-compose.override.yml" <<EOF
+# Managed by remnawave-reverse-proxy (rw-core updater). Mounts a locally built
+# Xray-core over the image core. Remove this file to revert to the bundled core.
+services:
+  remnanode:
+    volumes:
+      - $dir/rw-core:/usr/local/bin/xray:ro
+EOF
+
+    echo "$tag" > "$dir/.rw-core-version"
+
+    msg_info "${LANG[RW_RESTARTING]:-Recreating node container...}"
+    ( cd "$dir" && docker compose up -d --force-recreate remnanode ) >/dev/null 2>&1 &
+    spinner $! "${LANG[WAITING]}"
+}
+
+rw_cleanup() {
+    local tmp="$1"
+    [ -n "$tmp" ] && [ -d "$tmp" ] || return 0
+    chmod -R u+w "$tmp" 2>/dev/null
+    rm -rf "$tmp"
+}
+
+# Full update flow: build $tag and install it. $tag empty => latest.
+rw_update_to() {
+    local dir tag arch tmp
+    dir="$(rw_node_dir)" || { msg_err "${LANG[RW_NO_NODE]:-remnanode is not installed on this server.}"; return 1; }
+    arch="$(rw_arch)" || true
+    [ -z "$arch" ] && { msg_err "$(printf "${LANG[RW_ARCH]:-Unsupported architecture: %s}" "$(uname -m)")"; return 1; }
+    command -v docker >/dev/null 2>&1 || { msg_err "${LANG[RW_NO_DOCKER]:-Docker is not installed.}"; return 1; }
+    command -v git >/dev/null 2>&1 || { msg_err "git is required"; return 1; }
+
+    tag="${1:-$(rw_latest_tag)}"
+    [ -z "$tag" ] && { msg_err "${LANG[RW_NO_TAG]:-Could not determine the latest version.}"; return 1; }
+
+    echo
+    msg_info "$(printf "${LANG[RW_TARGET]:-Target version: %s   node dir: %s}" "$tag" "$dir")"
+
+    # Build under a disk-backed temp dir (not /tmp which may be tmpfs/RAM).
+    tmp="$(mktemp -d -p /var/tmp rw-core.XXXXXX)" || { msg_err "mktemp failed"; return 1; }
+    if rw_build "$tmp" "$tag" "$arch" && rw_install_into_node "$dir" "$tmp" "$tag"; then
+        rw_cleanup "$tmp"
+        echo
+        msg_ok "$(printf "${LANG[RW_DONE]:-rw-core updated to %s. Build files cleaned up.}" "$tag")"
+        return 0
+    fi
+    rw_cleanup "$tmp"
+    msg_err "${LANG[RW_FAILED]:-rw-core update failed (node left unchanged).}"
+    return 1
+}
+
+rw_check_update() {
+    local dir cur latest
+    dir="$(rw_node_dir)" || { msg_err "${LANG[RW_NO_NODE]:-remnanode is not installed on this server.}"; return 1; }
+    cur="$(rw_installed_ver "$dir")"
+    latest="$(rw_latest_tag)"
+    [ -z "$latest" ] && { msg_err "${LANG[RW_NO_TAG]:-Could not determine the latest version.}"; return 1; }
+
+    echo
+    msg_info "$(printf "${LANG[RW_CUR]:-Installed: %s}" "${cur:-${LANG[RW_STOCK]:-stock (image bundled)}}")"
+    msg_info "$(printf "${LANG[RW_LATEST]:-Latest upstream: %s}" "$latest")"
+
+    if [ -n "$cur" ] && [ "$cur" = "$latest" ]; then
+        echo; msg_ok "${LANG[RW_UPTODATE]:-Already on the latest version.}"
+        return 0
+    fi
+    echo
+    local ans
+    reading "${LANG[RW_REBUILD_CONFIRM]:-A newer version is available. Rebuild now? (y/n):}" ans
+    [[ "$ans" == "y" || "$ans" == "Y" ]] && rw_update_to "$latest"
+}
+
+rw_revert() {
+    local dir
+    dir="$(rw_node_dir)" || { msg_err "${LANG[RW_NO_NODE]:-remnanode is not installed on this server.}"; return 1; }
+    [ -f "$dir/docker-compose.override.yml" ] || { msg_warn "${LANG[RW_NOTHING]:-No custom core is active.}"; return 0; }
+    rm -f "$dir/docker-compose.override.yml" "$dir/rw-core" "$dir/.rw-core-version"
+    msg_info "${LANG[RW_RESTARTING]:-Recreating node container...}"
+    ( cd "$dir" && docker compose up -d --force-recreate remnanode ) >/dev/null 2>&1 &
+    spinner $! "${LANG[WAITING]}"
+    echo; msg_ok "${LANG[RW_REVERTED]:-Reverted to the image-bundled core.}"
+}
+
+show_rw_core_menu() {
+    print_header
+    printf "\n  %b%s%b\n" "$COLOR_CORAL_B" "${LANG[RW_TITLE]:-Node core (rw-core / Xray)}" "$COLOR_RESET"
+    printf "  %b%s%b\n"   "$COLOR_DIM"     "${LANG[RW_SUBTITLE]:-Build the latest Xray-core from source for remnanode}" "$COLOR_RESET"
+
+    menu_head "${LANG[RW_GROUP]:-Actions}"
+    menu_item 1 "${LANG[RW_M_UPDATE]:-Update to latest (build from source)}"
+    menu_item 2 "${LANG[RW_M_CHECK]:-Check for update (rebuild only if newer)}"
+    menu_item 3 "${LANG[RW_M_REVERT]:-Revert to bundled core}"
+    echo
+    menu_item 0 "${LANG[NA_BACK]:-Back}"
+    echo
+}
+
+manage_rw_core() {
+    while true; do
+        show_rw_core_menu
+        reading "${LANG[NA_PROMPT]:-Select option:}" RW_OPTION
+        case "$RW_OPTION" in
+            1) rw_update_to "" ;;
+            2) rw_check_update ;;
+            3) rw_revert ;;
+            0) return 0 ;;
+            *) msg_warn "${LANG[NA_INVALID]:-Invalid choice.}"; sleep 1; continue ;;
+        esac
+        echo
+        reading "${LANG[NA_CONTINUE]:-Press Enter to return to the menu}" _rw_dummy
+    done
+}
